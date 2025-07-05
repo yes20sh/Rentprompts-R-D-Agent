@@ -1,0 +1,960 @@
+{
+  "name": "R&D agent",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "dc5f24b0-3325-49b3-b2a1-9c9ee2d7a12f",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -640,
+        760
+      ],
+      "id": "8e058017-7f2b-461f-902f-a6fc4e9976af",
+      "name": "Webhook",
+      "webhookId": "dc5f24b0-3325-49b3-b2a1-9c9ee2d7a12f"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Message: {{ $json.body.message }}\nSummarizer: {{ $json.body.summarizer }}\ndeepWebSearch: {{ $json.body.deepWebSearch }}\nHistory: {{ $json.body.history[0].sender }} {{ $json.body.history[0].message }}\n\nUploaded File Content:\n{{ $('Webhook').item.json.body.extractedText }}\n\n",
+        "options": {
+          "systemMessage": "=# Advanced Research & Development AI Agent – System Prompt\n\nYou are an advanced Research & Development AI Agent. Your role is to assist users by analyzing their messages, uploaded documents, web search results, and conversation history. You can answer complex questions, summarize content, and synthesize insights from multiple sources.\n\n## Behavior Rules\n\n1. **If `Summarizer` is `true`**:\n   - Generate a concise, 3–5 sentence summary.\n   - Integrate uploaded document content, web search results, and user queries.\n\n2. **If `Summarizer` is `false`**:\n   - Provide a **structured, detailed response** with clear headings and bullet points.\n   - Use data from all sources: user input, documents, web results, and conversation history.\n\n3. **Knowledge & Memory**:\n   - Always use:\n     -  **MongoDB** for chat memory\n     -  **SerpAPI** for real-time web search\n\n4. **If a document is uploaded**:\n   - Parse and extract relevant content.\n   - Integrate insights into the answer.\n\n5. **Context Awareness**:\n   - Use full chat history to maintain context and continuity.\n\n## Output Format\n\n- **Title / Heading**: Short descriptive title.\n- **Context Summary**: One paragraph summarizing the user’s question, document content, and any search results.\n- **Main Answer**:\n  - Structured using bullet points, subheadings, and logical flow.\n- **Citations** *(if applicable)*:\n  - Numbered list of sources used (web or document).\n- if their is (hii, hello, whatsup) reply casually \n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        260,
+        760
+      ],
+      "id": "a7a29ebf-0531-4ac3-91c0-7d3796de8440",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1740,
+        460
+      ],
+      "id": "8ed64851-c9c0-424a-955f-529c285e3ee0",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a87ae100-f3e0-4135-adf3-1b1786bdc3a5",
+              "leftValue": "={{ $json.body.deepWebSearch }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -100,
+        580
+      ],
+      "id": "339c4067-aecc-48e3-bd93-552ff9d50ff6",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "url": "https://api.scrapingdog.com/google",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "api_key",
+              "value": "68667c13a8c1cffe57e521ee"
+            },
+            {
+              "name": "query",
+              "value": "={{ $json.body.message }}"
+            },
+            {
+              "name": "page",
+              "value": "5"
+            },
+            {
+              "name": "country",
+              "value": "in"
+            },
+            {
+              "name": "results",
+              "value": "5"
+            },
+            {
+              "name": "advance_search",
+              "value": "false"
+            },
+            {
+              "name": "ai_overview",
+              "value": "false"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "result"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        360
+      ],
+      "id": "49b9b0a7-3a7c-4d3f-be37-a8df01e0b7d0",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = items[0].json;\nconst results = item.organic_results || [];\n\nconst links = results.length > 0\n  ? results.map(r => ({\n      link: r.link || '',\n      title: r.title || '',\n      snippet: r.snippet || ''\n    }))\n  : [{\n      link: 'https://www.google.com',\n      title: 'No search results found',\n      snippet: 'Try refining your query or check if the scraping returned valid organic results.'\n    }];\n\nreturn [\n  {\n    json: {\n      links\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        420,
+        360
+      ],
+      "id": "1adfefe1-9177-4d2e-86d9-c2b964dda373",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.model }}",
+                    "rightValue": "Gemini-2.0-flash",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "0504790c-6d82-4085-b8f9-8362b7c2319a"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "dc705ccf-2b4e-41d4-bc70-83e1ff7f5044",
+                    "leftValue": "={{ $json.body.model }}",
+                    "rightValue": "GPT-4o-mini",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "89b2765a-079f-4bd0-a7b0-8c62f9519635",
+                    "leftValue": "={{ $json.body.model }}",
+                    "rightValue": "LLaMA-3",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -340,
+        760
+      ],
+      "id": "2ce43414-c43c-4a78-beb4-732709bd3286",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        200,
+        1000
+      ],
+      "id": "ecb79039-5922-4643-9372-ed773a5b64ed",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "XTFcX43uArQ5KNMM",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9e4d1ce4-2a9c-497f-9428-0334a4ce0a8d",
+              "name": "links",
+              "value": "={{ $json.links }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        580,
+        360
+      ],
+      "id": "6259ac7a-cec5-4689-b054-93933b925c4c",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').item.json.body.message }}\n{{ $('Webhook').item.json.body.history[0].message }}",
+        "databaseName": "n8n",
+        "contextWindowLength": 30
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
+      "typeVersion": 1,
+      "position": [
+        360,
+        1000
+      ],
+      "id": "1ce1bac6-c266-4642-bd81-a1795d27899c",
+      "name": "MongoDB Chat Memory",
+      "credentials": {
+        "mongoDb": {
+          "id": "0OHPtdWXJrP9q5ix",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "typeVersion": 1,
+      "position": [
+        520,
+        1000
+      ],
+      "id": "e63674bc-4b8d-4ed7-8bfd-f2019a8e928b",
+      "name": "SerpAPI",
+      "credentials": {
+        "serpApi": {
+          "id": "woRLDJL4Do5Mtxly",
+          "name": "SerpAPI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.links[0].link }}\n{{ $json.links[0].title }}\n{{ $json.links[0].snippet }}\n\n{{ $json.links[1].link }}\n{{ $json.links[1].title }}\n{{ $json.links[1].snippet }}\n\n{{ $json.links[2].link }}\n{{ $json.links[2].title }}\n{{ $json.links[2].snippet }}\n\n{{ $json.links[3].link }}\n{{ $json.links[3].title }}\n{{ $json.links[3].snippet }}",
+        "options": {
+          "systemMessage": "You are a helpful assistant, analyze the website and give the structure professional detail answer also include source links\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        800,
+        360
+      ],
+      "id": "12420bb0-a448-488c-a798-a66f5dc3b55a",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-1.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        760,
+        520
+      ],
+      "id": "d783ab0d-9f4f-47f7-9d24-a53f488ac92f",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "XTFcX43uArQ5KNMM",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a87ae100-f3e0-4135-adf3-1b1786bdc3a5",
+              "leftValue": "={{ $json.body.deepWebSearch }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -100,
+        780
+      ],
+      "id": "e564d66f-4365-4bb9-bd7e-ea42a614568f",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Message: {{ $json.body.message }}\nSummarizer: {{ $json.body.summarizer }}\ndeepWebSearch: {{ $json.body.deepWebSearch }}\nHistory: {{ $json.body.history[0].sender }} {{ $json.body.history[0].message }}\n\nUploaded File Content:\n{{ $('Webhook').item.json.body.extractedText }}\n\n",
+        "options": {
+          "systemMessage": "=# 🧠 Advanced Research & Development AI Agent – System Prompt\n\nYou are an advanced Research & Development AI Agent. Your role is to assist users by analyzing their messages, uploaded documents, web search results, and conversation history. You can answer complex questions, summarize content, and synthesize insights from multiple sources.\n\n## 🧩 Behavior Rules\n\n1. **If `Summarizer` is `true`**:\n   - Generate a concise, 3–5 sentence summary.\n   - Integrate uploaded document content, web search results, and user queries.\n\n2. **If `Summarizer` is `false`**:\n   - Provide a **structured, detailed response** with clear headings and bullet points.\n   - Use data from all sources: user input, documents, web results, and conversation history.\n\n3. **Knowledge & Memory**:\n   - Always use:\n     - 🔸 **MongoDB** for chat memory\n     - 🔸 **SerpAPI** for real-time web search\n\n4. **If a document is uploaded**:\n   - Parse and extract relevant content.\n   - Integrate insights into the answer.\n\n5. **Context Awareness**:\n   - Use full chat history to maintain context and continuity.\n\n## 🧾 Output Format\n\n- **Title / Heading**: Short descriptive title.\n- **Context Summary**: One paragraph summarizing the user’s question, document content, and any search results.\n- **Main Answer**:\n  - Structured using bullet points, subheadings, and logical flow.\n- **Citations** *(if applicable)*:\n  - Numbered list of sources used (web or document).\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        780,
+        760
+      ],
+      "id": "90e805fd-27ef-4375-abf0-bfe465e3bd86",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').item.json.body.message }}\n{{ $('Webhook').item.json.body.history[0].message }}",
+        "databaseName": "n8n",
+        "contextWindowLength": 30
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
+      "typeVersion": 1,
+      "position": [
+        880,
+        1000
+      ],
+      "id": "5d2f79b9-5bc8-4d54-861a-39f5bba18ab1",
+      "name": "MongoDB Chat Memory1",
+      "credentials": {
+        "mongoDb": {
+          "id": "0OHPtdWXJrP9q5ix",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        1000
+      ],
+      "id": "6142ab55-55d9-4780-ae20-2084eff9689e",
+      "name": "SerpAPI1",
+      "credentials": {
+        "serpApi": {
+          "id": "woRLDJL4Do5Mtxly",
+          "name": "SerpAPI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Message: {{ $json.body.message }}\nSummarizer: {{ $json.body.summarizer }}\ndeepWebSearch: {{ $json.body.deepWebSearch }}\nHistory: {{ $json.body.history[0].sender }} {{ $json.body.history[0].message }}\n\nUploaded File Content:\n{{ $('Webhook').item.json.body.extractedText }}\n\n",
+        "options": {
+          "systemMessage": "=# 🧠 Advanced Research & Development AI Agent – System Prompt\n\nYou are an advanced Research & Development AI Agent. Your role is to assist users by analyzing their messages, uploaded documents, web search results, and conversation history. You can answer complex questions, summarize content, and synthesize insights from multiple sources.\n\n## 🧩 Behavior Rules\n\n1. **If `Summarizer` is `true`**:\n   - Generate a concise, 3–5 sentence summary.\n   - Integrate uploaded document content, web search results, and user queries.\n\n2. **If `Summarizer` is `false`**:\n   - Provide a **structured, detailed response** with clear headings and bullet points.\n   - Use data from all sources: user input, documents, web results, and conversation history.\n\n3. **Knowledge & Memory**:\n   - Always use:\n     - 🔸 **MongoDB** for chat memory\n     - 🔸 **SerpAPI** for real-time web search\n\n4. **If a document is uploaded**:\n   - Parse and extract relevant content.\n   - Integrate insights into the answer.\n\n5. **Context Awareness**:\n   - Use full chat history to maintain context and continuity.\n\n## 🧾 Output Format\n\n- **Title / Heading**: Short descriptive title.\n- **Context Summary**: One paragraph summarizing the user’s question, document content, and any search results.\n- **Main Answer**:\n  - Structured using bullet points, subheadings, and logical flow.\n- **Citations** *(if applicable)*:\n  - Numbered list of sources used (web or document).\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1320,
+        760
+      ],
+      "id": "a369fc5f-0244-4e34-8959-9567621e6c2c",
+      "name": "AI Agent3"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').item.json.body.message }}\n{{ $('Webhook').item.json.body.history[0].message }}",
+        "databaseName": "n8n",
+        "contextWindowLength": 30
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
+      "typeVersion": 1,
+      "position": [
+        1420,
+        1000
+      ],
+      "id": "6eaec9ae-4a68-4649-ae1c-4b4f703fd919",
+      "name": "MongoDB Chat Memory2",
+      "credentials": {
+        "mongoDb": {
+          "id": "0OHPtdWXJrP9q5ix",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "typeVersion": 1,
+      "position": [
+        1580,
+        1000
+      ],
+      "id": "b9bbd8e2-d045-4918-b0a9-befb3ec1688d",
+      "name": "SerpAPI2",
+      "credentials": {
+        "serpApi": {
+          "id": "woRLDJL4Do5Mtxly",
+          "name": "SerpAPI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a87ae100-f3e0-4135-adf3-1b1786bdc3a5",
+              "leftValue": "={{ $json.body.deepWebSearch }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -100,
+        980
+      ],
+      "id": "d0123ba9-bb90-4607-b9b4-0c963b26de18",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "content": "## Web Scrap",
+        "height": 360,
+        "width": 1020
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        160,
+        300
+      ],
+      "typeVersion": 1,
+      "id": "ccb9156a-06f9-41ca-b78c-2323b9fdd4b4",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Gemini Process",
+        "height": 460,
+        "width": 480,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        160,
+        700
+      ],
+      "typeVersion": 1,
+      "id": "5eacf99a-52c4-4631-a8f4-1c6ea337a0c8",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## GPT Process",
+        "height": 460,
+        "width": 480,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        680,
+        700
+      ],
+      "typeVersion": 1,
+      "id": "457dab59-149a-4abc-bcff-76e7b92de2f1",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## LLMA Process",
+        "height": 460,
+        "width": 480,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1200,
+        700
+      ],
+      "typeVersion": 1,
+      "id": "f9261f19-5f83-4ed2-8405-74493abd0090",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Condition",
+        "height": 660,
+        "width": 460,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -380,
+        500
+      ],
+      "typeVersion": 1,
+      "id": "4b12c815-f3b7-4b95-8b66-1775d5cf5b95",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        720,
+        1000
+      ],
+      "id": "23add5dd-49ff-4715-9a9c-b21d8ac3489a",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "JTrBxRi2aTdbHxeN",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "deepseek/deepseek-r1-distill-llama-70b:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        1000
+      ],
+      "id": "a526ff41-4390-498d-a0fd-f1f4e438bb98",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "h0480vOYDjdhYdGh",
+          "name": "OpenRouter account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MongoDB Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MongoDB Chat Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MongoDB Chat Memory2": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI2": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent3": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3d5018f4-32f5-499b-9aad-51771e7d48b4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e1270dfe6aa6f2cceaef25ec8340cd1c5e87f27e31b2889e167f8e4c8bcdaa0c"
+  },
+  "id": "pTGtaUcuKpm2OnCX",
+  "tags": []
+}
