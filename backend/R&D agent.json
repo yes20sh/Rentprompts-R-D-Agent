@@ -282,47 +282,6 @@
     },
     {
       "parameters": {
-        "sessionIdType": "customKey",
-        "sessionKey": "={{ $('Webhook').item.json.body.message }}\n{{ $('Webhook').item.json.body.history[0].message }}",
-        "databaseName": "n8n",
-        "contextWindowLength": 30
-      },
-      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
-      "typeVersion": 1,
-      "position": [
-        360,
-        1000
-      ],
-      "id": "1ce1bac6-c266-4642-bd81-a1795d27899c",
-      "name": "MongoDB Chat Memory",
-      "credentials": {
-        "mongoDb": {
-          "id": "0OHPtdWXJrP9q5ix",
-          "name": "MongoDB account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
-      "typeVersion": 1,
-      "position": [
-        520,
-        1000
-      ],
-      "id": "e63674bc-4b8d-4ed7-8bfd-f2019a8e928b",
-      "name": "SerpAPI",
-      "credentials": {
-        "serpApi": {
-          "id": "woRLDJL4Do5Mtxly",
-          "name": "SerpAPI account"
-        }
-      }
-    },
-    {
-      "parameters": {
         "promptType": "define",
         "text": "={{ $json.links[0].link }}\n{{ $json.links[0].title }}\n{{ $json.links[0].snippet }}\n\n{{ $json.links[1].link }}\n{{ $json.links[1].title }}\n{{ $json.links[1].snippet }}\n\n{{ $json.links[2].link }}\n{{ $json.links[2].title }}\n{{ $json.links[2].snippet }}\n\n{{ $json.links[3].link }}\n{{ $json.links[3].title }}\n{{ $json.links[3].snippet }}",
         "options": {
@@ -397,7 +356,7 @@
         "promptType": "define",
         "text": "=Message: {{ $json.body.message }}\nSummarizer: {{ $json.body.summarizer }}\ndeepWebSearch: {{ $json.body.deepWebSearch }}\nHistory: {{ $json.body.history[0].sender }} {{ $json.body.history[0].message }}\n\nUploaded File Content:\n{{ $('Webhook').item.json.body.extractedText }}\n\n",
         "options": {
-          "systemMessage": "=# 🧠 Advanced Research & Development AI Agent – System Prompt\n\nYou are an advanced Research & Development AI Agent. Your role is to assist users by analyzing their messages, uploaded documents, web search results, and conversation history. You can answer complex questions, summarize content, and synthesize insights from multiple sources.\n\n## 🧩 Behavior Rules\n\n1. **If `Summarizer` is `true`**:\n   - Generate a concise, 3–5 sentence summary.\n   - Integrate uploaded document content, web search results, and user queries.\n\n2. **If `Summarizer` is `false`**:\n   - Provide a **structured, detailed response** with clear headings and bullet points.\n   - Use data from all sources: user input, documents, web results, and conversation history.\n\n3. **Knowledge & Memory**:\n   - Always use:\n     - 🔸 **MongoDB** for chat memory\n     - 🔸 **SerpAPI** for real-time web search\n\n4. **If a document is uploaded**:\n   - Parse and extract relevant content.\n   - Integrate insights into the answer.\n\n5. **Context Awareness**:\n   - Use full chat history to maintain context and continuity.\n\n## 🧾 Output Format\n\n- **Title / Heading**: Short descriptive title.\n- **Context Summary**: One paragraph summarizing the user’s question, document content, and any search results.\n- **Main Answer**:\n  - Structured using bullet points, subheadings, and logical flow.\n- **Citations** *(if applicable)*:\n  - Numbered list of sources used (web or document).\n"
+          "systemMessage": "=# Advanced Research & Development AI Agent – System Prompt\n\nYou are an advanced Research & Development AI Agent. Your role is to assist users by analyzing their messages, uploaded documents, web search results, and conversation history. You can answer complex questions, summarize content, and synthesize insights from multiple sources.\n\n## Behavior Rules\n\n1. **If `Summarizer` is `true`**:\n   - Generate a concise, 3–5 sentence summary.\n   - Integrate uploaded document content, web search results, and user queries.\n\n2. **If `Summarizer` is `false`**:\n   - Provide a **structured, detailed response** with clear headings and bullet points.\n   - Use data from all sources: user input, documents, web results, and conversation history.\n\n3. **Knowledge & Memory**:\n   - Always use:\n     -  **MongoDB** for chat memory\n     -  **SerpAPI** for real-time web search\n\n4. **If a document is uploaded**:\n   - Parse and extract relevant content.\n   - Integrate insights into the answer.\n\n5. **Context Awareness**:\n   - Use full chat history to maintain context and continuity.\n\n## Output Format\n\n- **Title / Heading**: Short descriptive title.\n- **Context Summary**: One paragraph summarizing the user’s question, document content, and any search results.\n- **Main Answer**:\n  - Structured using bullet points, subheadings, and logical flow.\n- **Citations** *(if applicable)*:\n  - Numbered list of sources used (web or document).\n- if their is (hii, hello, whatsup) reply casually \n"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -411,51 +370,10 @@
     },
     {
       "parameters": {
-        "sessionIdType": "customKey",
-        "sessionKey": "={{ $('Webhook').item.json.body.message }}\n{{ $('Webhook').item.json.body.history[0].message }}",
-        "databaseName": "n8n",
-        "contextWindowLength": 30
-      },
-      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
-      "typeVersion": 1,
-      "position": [
-        880,
-        1000
-      ],
-      "id": "5d2f79b9-5bc8-4d54-861a-39f5bba18ab1",
-      "name": "MongoDB Chat Memory1",
-      "credentials": {
-        "mongoDb": {
-          "id": "0OHPtdWXJrP9q5ix",
-          "name": "MongoDB account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
-      "typeVersion": 1,
-      "position": [
-        1040,
-        1000
-      ],
-      "id": "6142ab55-55d9-4780-ae20-2084eff9689e",
-      "name": "SerpAPI1",
-      "credentials": {
-        "serpApi": {
-          "id": "woRLDJL4Do5Mtxly",
-          "name": "SerpAPI account"
-        }
-      }
-    },
-    {
-      "parameters": {
         "promptType": "define",
         "text": "=Message: {{ $json.body.message }}\nSummarizer: {{ $json.body.summarizer }}\ndeepWebSearch: {{ $json.body.deepWebSearch }}\nHistory: {{ $json.body.history[0].sender }} {{ $json.body.history[0].message }}\n\nUploaded File Content:\n{{ $('Webhook').item.json.body.extractedText }}\n\n",
         "options": {
-          "systemMessage": "=# 🧠 Advanced Research & Development AI Agent – System Prompt\n\nYou are an advanced Research & Development AI Agent. Your role is to assist users by analyzing their messages, uploaded documents, web search results, and conversation history. You can answer complex questions, summarize content, and synthesize insights from multiple sources.\n\n## 🧩 Behavior Rules\n\n1. **If `Summarizer` is `true`**:\n   - Generate a concise, 3–5 sentence summary.\n   - Integrate uploaded document content, web search results, and user queries.\n\n2. **If `Summarizer` is `false`**:\n   - Provide a **structured, detailed response** with clear headings and bullet points.\n   - Use data from all sources: user input, documents, web results, and conversation history.\n\n3. **Knowledge & Memory**:\n   - Always use:\n     - 🔸 **MongoDB** for chat memory\n     - 🔸 **SerpAPI** for real-time web search\n\n4. **If a document is uploaded**:\n   - Parse and extract relevant content.\n   - Integrate insights into the answer.\n\n5. **Context Awareness**:\n   - Use full chat history to maintain context and continuity.\n\n## 🧾 Output Format\n\n- **Title / Heading**: Short descriptive title.\n- **Context Summary**: One paragraph summarizing the user’s question, document content, and any search results.\n- **Main Answer**:\n  - Structured using bullet points, subheadings, and logical flow.\n- **Citations** *(if applicable)*:\n  - Numbered list of sources used (web or document).\n"
+          "systemMessage": "=# Advanced Research & Development AI Agent – System Prompt\n\nYou are an advanced Research & Development AI Agent. Your role is to assist users by analyzing their messages, uploaded documents, web search results, and conversation history. You can answer complex questions, summarize content, and synthesize insights from multiple sources.\n\n## Behavior Rules\n\n1. **If `Summarizer` is `true`**:\n   - Generate a concise, 3–5 sentence summary.\n   - Integrate uploaded document content, web search results, and user queries.\n\n2. **If `Summarizer` is `false`**:\n   - Provide a **structured, detailed response** with clear headings and bullet points.\n   - Use data from all sources: user input, documents, web results, and conversation history.\n\n3. **Knowledge & Memory**:\n   - Always use:\n     -  **MongoDB** for chat memory\n     -  **SerpAPI** for real-time web search\n\n4. **If a document is uploaded**:\n   - Parse and extract relevant content.\n   - Integrate insights into the answer.\n\n5. **Context Awareness**:\n   - Use full chat history to maintain context and continuity.\n\n## Output Format\n\n- **Title / Heading**: Short descriptive title.\n- **Context Summary**: One paragraph summarizing the user’s question, document content, and any search results.\n- **Main Answer**:\n  - Structured using bullet points, subheadings, and logical flow.\n- **Citations** *(if applicable)*:\n  - Numbered list of sources used (web or document).\n- if their is (hii, hello, whatsup) reply casually \n"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -466,47 +384,6 @@
       ],
       "id": "a369fc5f-0244-4e34-8959-9567621e6c2c",
       "name": "AI Agent3"
-    },
-    {
-      "parameters": {
-        "sessionIdType": "customKey",
-        "sessionKey": "={{ $('Webhook').item.json.body.message }}\n{{ $('Webhook').item.json.body.history[0].message }}",
-        "databaseName": "n8n",
-        "contextWindowLength": 30
-      },
-      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
-      "typeVersion": 1,
-      "position": [
-        1420,
-        1000
-      ],
-      "id": "6eaec9ae-4a68-4649-ae1c-4b4f703fd919",
-      "name": "MongoDB Chat Memory2",
-      "credentials": {
-        "mongoDb": {
-          "id": "0OHPtdWXJrP9q5ix",
-          "name": "MongoDB account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
-      "typeVersion": 1,
-      "position": [
-        1580,
-        1000
-      ],
-      "id": "b9bbd8e2-d045-4918-b0a9-befb3ec1688d",
-      "name": "SerpAPI2",
-      "credentials": {
-        "serpApi": {
-          "id": "woRLDJL4Do5Mtxly",
-          "name": "SerpAPI account"
-        }
-      }
     },
     {
       "parameters": {
@@ -664,6 +541,63 @@
           "name": "OpenRouter account"
         }
       }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "typeVersion": 1,
+      "position": [
+        1020,
+        1280
+      ],
+      "id": "b9bbd8e2-d045-4918-b0a9-befb3ec1688d",
+      "name": "SerpAPI2",
+      "credentials": {
+        "serpApi": {
+          "id": "woRLDJL4Do5Mtxly",
+          "name": "SerpAPI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').item.json.body.message }}\n{{ $('Webhook').item.json.body.history[0].message }}",
+        "databaseName": "n8n",
+        "contextWindowLength": 30
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
+      "typeVersion": 1,
+      "position": [
+        760,
+        1280
+      ],
+      "id": "6eaec9ae-4a68-4649-ae1c-4b4f703fd919",
+      "name": "MongoDB Chat Memory2",
+      "credentials": {
+        "mongoDb": {
+          "id": "0OHPtdWXJrP9q5ix",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## DB Memory & Tools",
+        "height": 240,
+        "width": 480,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        680,
+        1200
+      ],
+      "typeVersion": 1,
+      "id": "bfe84e1c-5293-43e2-947a-6b10256b565c",
+      "name": "Sticky Note5"
     }
   ],
   "pinData": {},
@@ -777,28 +711,6 @@
         ]
       ]
     },
-    "MongoDB Chat Memory": {
-      "ai_memory": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_memory",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "SerpAPI": {
-      "ai_tool": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "AI Agent1": {
       "main": [
         [
@@ -839,56 +751,12 @@
         ]
       ]
     },
-    "MongoDB Chat Memory1": {
-      "ai_memory": [
-        [
-          {
-            "node": "AI Agent2",
-            "type": "ai_memory",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "SerpAPI1": {
-      "ai_tool": [
-        [
-          {
-            "node": "AI Agent2",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "AI Agent2": {
       "main": [
         [
           {
             "node": "Respond to Webhook",
             "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "MongoDB Chat Memory2": {
-      "ai_memory": [
-        [
-          {
-            "node": "AI Agent3",
-            "type": "ai_memory",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "SerpAPI2": {
-      "ai_tool": [
-        [
-          {
-            "node": "AI Agent3",
-            "type": "ai_tool",
             "index": 0
           }
         ]
@@ -944,13 +812,55 @@
           }
         ]
       ]
+    },
+    "SerpAPI2": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "AI Agent2",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MongoDB Chat Memory2": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "AI Agent2",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "3d5018f4-32f5-499b-9aad-51771e7d48b4",
+  "versionId": "10e2c00c-a5b7-4ccd-9756-4a691bf905a9",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "e1270dfe6aa6f2cceaef25ec8340cd1c5e87f27e31b2889e167f8e4c8bcdaa0c"
