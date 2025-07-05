@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { marked } from 'marked';
 import { extractTextFromPDF, extractTextFromDocx } from '../utils/fileUtils';
 
-const WEBHOOK_URL = import.meta.env.VITE_WEBHOOK_URL;
+const WEBHOOK_URL = import.meta.env.N8N_WEBHOOK_URL;
 
 export default function useChatLogic() {
   const [chatHistory, setChatHistory] = useState([]);
